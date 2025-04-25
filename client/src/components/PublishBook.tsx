@@ -10,9 +10,6 @@ import { Label } from "@/components/ui/label"
 import { Button } from "./ui/button"
 import axios from "axios"
 import { toast } from "sonner"
-
-
-
 function FileIcon(props: any) {
   return (
     <svg
@@ -32,29 +29,29 @@ function FileIcon(props: any) {
     </svg>
   )
 }
-
 const PublishBook = () => {
-
   const [file, setFile] = useState<File | null>(null)
   const [title, setTitle] = useState("")
   const [genre, setGenre] = useState("")
   const [year, setYear] = useState("")
   const [author, setAuthor] = useState("")
-
+  const [price, setPrice] = useState("")
   const handleBookUpload = async () => {
-
     if (!file) {
       toast.error("📂 Please select a file to upload.")
       return
     }
-
+    if (file.type !== "application/pdf") {
+      toast.error("❌ Only PDF files are allowed.")
+      return
+    }
     const formData = new FormData()
     formData.append("file", file)
     formData.append("title", title)
     formData.append("genre", genre)
     formData.append("year", year)
     formData.append("author", author)
-
+    formData.append("price", price)
     try {
       const response = await axios.post('/api/books/upload', formData)
       if (response.data.error) {
@@ -69,9 +66,7 @@ const PublishBook = () => {
         toast.error("An error occured while uploading the book. Please try again")
       }
     }
-
   }
-
   return (
     <div className="p-4 md:p-6 max-w-md mx-auto w-full">
       <Card className="">
@@ -88,11 +83,12 @@ const PublishBook = () => {
             <Label htmlFor="file" className="text-sm font-medium">
               File
             </Label>
-            <Input id="file" type="file" placeholder="File" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+            <Input id="file" type="file" placeholder="File" accept="application/pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} />
             <Input id="Title" type="text" placeholder="Name of book" onChange={(e) => setTitle(e.target.value)} />
             <Input id="Genre" type="text" placeholder="Genre" onChange={(e) => setGenre(e.target.value)} />
             <Input id="Publication year" type="text" placeholder="Publication Year" onChange={(e) => setYear(e.target.value)} />
             <Input id="Author" type="text" placeholder="Author" onChange={(e) => setAuthor(e.target.value)} />
+            <Input id="Price" type="text" placeholder="Price" onChange={(e) => setPrice(e.target.value)} />
           </div>
         </CardContent>
         <CardFooter>
@@ -102,5 +98,4 @@ const PublishBook = () => {
     </div>
   )
 }
-
 export default PublishBook

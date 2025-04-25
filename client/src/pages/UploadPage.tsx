@@ -1,12 +1,10 @@
 import PublishBook from '@/components/PublishBook';
-import UploadDocument from '@/components/UploadDocument';
 
 const UploadPage = () => {
 
   return (
-    <div className='flex justify-between p-12 my-10'>
+    <div className='flex justify-center items-center p-12 my-10'>
       <PublishBook/>
-      <UploadDocument/>
     </div>
   )
 }

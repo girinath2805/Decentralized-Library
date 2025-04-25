@@ -1,4 +1,3 @@
-// WalletContext.tsx
 import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { ethers } from 'ethers';
 import walletConnectFcn from '@/lib/walletConnect';
