@@ -1,13 +1,15 @@
-import type { BookType } from "../types"
-import { Card, CardContent, CardFooter } from "./ui/card"
-import { Badge } from "./ui/badge"
+import type { StoreBookType } from "../../types"
+import { Card, CardContent, CardFooter } from "../ui/card"
+import { Badge } from "../ui/badge"
 import { Star } from "lucide-react"
+import { Button } from "../ui/button"
 
-interface BookGridProps {
-  books: BookType[]
+interface StoreBookGridProps {
+  books: StoreBookType[]
+  addToCart: (book: StoreBookType) => void
 }
 
-const BookGrid = ({ books }: BookGridProps) => {
+export function StoreBookGrid({ books, addToCart }: StoreBookGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {books.map((book) => (
@@ -25,10 +27,16 @@ const BookGrid = ({ books }: BookGridProps) => {
             <p className="text-muted-foreground">{book.author}</p>
             <p className="text-sm text-muted-foreground">{book.year}</p>
           </CardContent>
-          <CardFooter className="pt-0">
+          <CardFooter className="pt-0 flex justify-between items-center">
             <div className="flex items-center">
               <Star className="h-4 w-4 fill-primary text-primary mr-1" />
               <span>{book.rating.toFixed(1)}</span>
+            </div>
+            <div className="text-right">
+              <div className="font-medium">${book.price.toFixed(2)}</div>
+              <Button size="sm" onClick={() => addToCart(book)} disabled={book.stock === 0}>
+                {book.stock > 0 ? "Add to Cart" : "Out of Stock"}
+              </Button>
             </div>
           </CardFooter>
         </Card>
@@ -36,5 +44,3 @@ const BookGrid = ({ books }: BookGridProps) => {
     </div>
   )
 }
-
-export default BookGrid

@@ -1,13 +1,15 @@
-import type { BookType } from "../types"
-import { Card, CardContent } from "./ui/card"
-import { Badge } from "./ui/badge"
+import type { StoreBookType } from "../../types"
+import { Card, CardContent } from "../ui/card"
+import { Badge } from "../ui/badge"
 import { Star } from "lucide-react"
+import { Button } from "../ui/button"
 
-interface BookListProps {
-  books: BookType[]
+interface StoreBookListProps {
+  books: StoreBookType[]
+  addToCart: (book: StoreBookType) => void
 }
 
-const BookList = ({ books }: BookListProps) => {
+export function StoreBookList({ books, addToCart }: StoreBookListProps) {
   return (
     <div className="space-y-4">
       {books.map((book) => (
@@ -28,9 +30,17 @@ const BookList = ({ books }: BookListProps) => {
                   <p className="text-muted-foreground">{book.author}</p>
                   <p className="text-sm text-muted-foreground">{book.year}</p>
                 </div>
-                <div className="flex items-center mt-2">
-                  <Star className="h-4 w-4 fill-primary text-primary mr-1" />
-                  <span>{book.rating.toFixed(1)}</span>
+                <div className="flex items-center justify-between mt-2">
+                  <div className="flex items-center">
+                    <Star className="h-4 w-4 fill-primary text-primary mr-1" />
+                    <span>{book.rating.toFixed(1)}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="font-medium">${book.price.toFixed(2)}</div>
+                    <Button size="sm" onClick={() => addToCart(book)} disabled={book.stock === 0}>
+                      {book.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -40,5 +50,3 @@ const BookList = ({ books }: BookListProps) => {
     </div>
   )
 }
-
-export default BookList
