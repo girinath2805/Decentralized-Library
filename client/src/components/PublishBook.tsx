@@ -58,6 +58,7 @@ const PublishBook = () => {
         toast.error(response.data.error)
       } else {
         toast.success("Book uploaded succesfully")
+        console.log(response.data)
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -92,7 +93,7 @@ const PublishBook = () => {
           </div>
         </CardContent>
         <CardFooter>
-          <Button size="lg" onCanPlay={handleBookUpload}>Upload</Button>
+          <Button size="lg" onClick={handleBookUpload}>Upload</Button>
         </CardFooter>
       </Card>
     </div>

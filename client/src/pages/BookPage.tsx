@@ -8,6 +8,7 @@ import { ShoppingCart as CartComponent } from "@/components/store/ShoppingCart"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BookOpen, BookMarked } from "lucide-react"
 import type { CartItem, CollectionBookType, StoreBookType } from "../types"
+import axios from "axios"
 
 // Sample store books data
 const sampleStoreBooks: StoreBookType[] = [
@@ -124,6 +125,10 @@ function BookPage() {
   const [collectionBooks, setCollectionBooks] = useState<CollectionBookType[]>(sampleCollectionBooks)
   const [storeBooks, setStoreBooks] = useState<StoreBookType[]>(sampleStoreBooks)
   const [purchasedBooks, setPurchasedBooks] = useState<StoreBookType[]>([])
+
+  const getBooksCollection = async() => {
+    const books = await axios.get('/api/book/')
+  }
 
   // Cart functions
   const addToCart = (book: StoreBookType) => {
