@@ -1,112 +1,30 @@
-import { useEffect, useState } from "react"
-import { CollectionView } from "@/components/collection/CollectionView"
-import { StoreView } from "@/components/store/StoreView"
-import { ShoppingCart } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { ShoppingCart as CartComponent } from "@/components/store/ShoppingCart"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BookOpen, BookMarked } from "lucide-react"
-import type { CartItem, BookType, StoreBookType } from "../types"
-import axios from "axios"
-import { useWallet } from "@/context/WalletContext"
-import { toast } from "sonner"
-
-// Sample store books data
-const sampleStoreBooks: StoreBookType[] = [
-  {
-    id: "1",
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    coverUrl: "/placeholder.svg?height=250&width=180",
-    year: 1925,
-    genre: "Classic",
-    price: 12.99,
-  },
-  {
-    id: "2",
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    coverUrl: "/placeholder.svg?height=250&width=180",
-    year: 1960,
-    genre: "Fiction",
-    price: 14.99,
-  },
-  {
-    id: "3",
-    title: "1984",
-    author: "George Orwell",
-    coverUrl: "/placeholder.svg?height=250&width=180",
-    year: 1949,
-    genre: "Dystopian",
-    price: 11.99,
-  },
-  {
-    id: "4",
-    title: "The Hobbit",
-    author: "J.R.R. Tolkien",
-    coverUrl: "/placeholder.svg?height=250&width=180",
-    year: 1937,
-    genre: "Fantasy",
-    price: 15.99,
-  },
-  {
-    id: "5",
-    title: "Pride and Prejudice",
-    author: "Jane Austen",
-    coverUrl: "/placeholder.svg?height=250&width=180",
-    year: 1813,
-    genre: "Romance",
-    price: 9.99,
-  },
-  {
-    id: "6",
-    title: "The Catcher in the Rye",
-    author: "J.D. Salinger",
-    coverUrl: "/placeholder.svg?height=250&width=180",
-    year: 1951,
-    genre: "Coming-of-age",
-    price: 13.99,
-  },
-]
-
-// Sample collection books data
-const sampleCollectionBooks: BookType[] = [
-  {
-    id: "101",
-    title: "Harry Potter and the Philosopher's Stone",
-    author: "J.K. Rowling",
-    coverUrl: "/placeholder.svg?height=250&width=180",
-    year: 1997,
-    genre: "Fantasy",
-  },
-  {
-    id: "102",
-    title: "The Lord of the Rings",
-    author: "J.R.R. Tolkien",
-    coverUrl: "/placeholder.svg?height=250&width=180",
-    year: 1954,
-    genre: "Fantasy",
-  },
-  {
-    id: "103",
-    title: "Dune",
-    author: "Frank Herbert",
-    coverUrl: "/placeholder.svg?height=250&width=180",
-    year: 1965,
-    genre: "Science Fiction",
-  },
-]
+import { useEffect, useState } from "react";
+import { CollectionView } from "@/components/collection/CollectionView";
+import { StoreView } from "@/components/store/StoreView";
+import { ShoppingCart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ShoppingCart as CartComponent } from "@/components/store/ShoppingCart";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BookOpen, BookMarked } from "lucide-react";
+import type { CartItem, BookType, StoreBookType } from "../types";
+import axios from "axios";
+import { useWallet } from "@/context/WalletContext";
+import { toast } from "sonner";
+import { ethers } from "ethers";
+import { abi } from "@/abi";
 
 function BookPage() {
-  const [activeView, setActiveView] = useState<"collection" | "store">("collection")
-  const [cart, setCart] = useState<CartItem[]>([])
-  const [isCartOpen, setIsCartOpen] = useState(false)
-  const [collectionBooks, setCollectionBooks] = useState<BookType[]>(sampleCollectionBooks)
-  const [storeBooks, setStoreBooks] = useState<StoreBookType[]>(sampleStoreBooks)
-  const [purchasedBooks, setPurchasedBooks] = useState<StoreBookType[]>([])
+  const [activeView, setActiveView] = useState<"collection" | "store">(
+    "collection"
+  );
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [collectionBooks, setCollectionBooks] = useState<BookType[]>([]);
+  const [storeBooks, setStoreBooks] = useState<StoreBookType[]>([]);
+  const [purchasedBooks, setPurchasedBooks] = useState<StoreBookType[]>([]);
 
-  const { account } = useWallet();
+  const { account, provider, network, isConnected } = useWallet();
 
   useEffect(() => {
     const getBooksCollection = async () => {
@@ -115,115 +33,210 @@ function BookPage() {
           toast.error("Connect wallet");
           return;
         }
-        const response = await axios.get('/api/users/purchased', {
-          params: { address: account }
-        })
+        // const response = await axios.get("/api/users/purchased", {
+        //   params: { address: account },
+        // });
 
-        if (response.data.error) {
-          toast.error(response.data.error)
-        } else {
-          setCollectionBooks(response.data)
+        // if (response.data.error) {
+        //   toast.error(response.data.error);
+        // } else {
+        //   setCollectionBooks(response.data);
+        // }
+        const contract = new ethers.Contract(
+          import.meta.env.VITE_CONTRACT_ADDRESS,
+          abi,
+          provider
+        );
+        const totalBooks = await contract.bookCounter();
+        const purchased: BookType[] = [];
+
+        for (let i = 1; i <= totalBooks; i++) {
+          const book = await contract.books(i);
+          if (!book.exists) continue;
+
+          const hasPurchased = await contract.hasUserPurchased(i, account);
+          if (!hasPurchased) continue;
+          const metadata = await fetchMetadata(book.uri);
+          if (!metadata) continue;
+
+          purchased.push({
+            id: i.toString(),
+            title: metadata.title,
+            author: metadata.author,
+            coverUrl:
+              metadata.coverUrl || "/placeholder.svg?height=250&width=180",
+            year: parseInt(metadata.year),
+            genre: metadata.genre,
+          });
         }
+
+        setCollectionBooks(purchased);
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
-          toast.error(error.response.data.error)
+          toast.error(error.response.data.error);
         } else {
-          toast.error("An error occurred while getting books collection. Please try again.")
+          toast.error(
+            "An error occurred while getting books collection. Please try again."
+          );
         }
       }
-    }
+    };
 
     const getStoreBooks = async () => {
       try {
-        const response = await axios.get('/api/books/allbooks')
-        if (response.data.error) {
-          toast.error(response.data.error)
-        } else {
-          const filtered = response.data.filter((storeBook: StoreBookType) =>
-            !collectionBooks.some((colBook) => colBook.id === storeBook.id)
-          );
-          setStoreBooks(filtered);
+        // const response = await axios.get("/api/books/allbooks");
+        // if (response.data.error) {
+        //   toast.error(response.data.error);
+        // } else {
+        //   const filtered = response.data.filter(
+        //     (storeBook: StoreBookType) =>
+        //       !collectionBooks.some((colBook) => colBook.id === storeBook.id)
+        //   );
+        //   setStoreBooks(filtered);
+        // }
+        if (!account || !provider) {
+          toast.error("Connect wallet");
+          return;
         }
 
+        const contract = new ethers.Contract(
+          import.meta.env.VITE_CONTRACT_ADDRESS,
+          abi,
+          provider
+        );
+
+        const totalBooks = await contract.bookCounter();
+        const store: StoreBookType[] = [];
+
+        for (let i = 1; i <= totalBooks; i++) {
+          const book = await contract.books(i);
+          if (!book.exists) continue;
+
+          const hasPurchased = await contract.hasUserPurchased(i, account);
+          if (hasPurchased) continue;
+
+          const metadata = await fetchMetadata(book.uri);
+          if (!metadata) continue;
+
+          store.push({
+            id: i.toString(),
+            title: metadata.title,
+            author: metadata.author,
+            coverUrl:
+              metadata.coverUrl || "/placeholder.svg?height=250&width=180",
+            year: parseInt(metadata.year),
+            genre: metadata.genre,
+            price: parseFloat(ethers.formatEther(book.price)),
+          });
+        }
+
+        setStoreBooks(store);
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
-          toast.error(error.response.data.error)
+          toast.error(error.response.data.error);
         } else {
-          toast.error("An error occurred while getting books collection. Please try again.")
+          toast.error(
+            "An error occurred while getting books collection. Please try again."
+          );
         }
       }
-    }
+    };
 
     getBooksCollection().then(getStoreBooks);
+  }, [account]);
 
-  }, [account])
-
-
+  async function fetchMetadata(url: string) {
+    try {
+      const res = await axios.get(url);
+      return res.data;
+    } catch (error) {
+      console.warn(`Failed to fetch metadata from ${url}`, error);
+      return null;
+    }
+  }
   // Cart functions
   const addToCart = (book: StoreBookType) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.book.id === book.id)
+      const existingItem = prevCart.find((item) => item.book.id === book.id);
       if (existingItem) {
         return prevCart.map((item) =>
-          item.book.id === book.id ? { ...item, quantity: item.quantity + 1 } : item,
-        )
+          item.book.id === book.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
       } else {
-        return [...prevCart, { book, quantity: 1 }]
+        return [...prevCart, { book, quantity: 1 }];
       }
-    })
-  }
+    });
+  };
 
   const removeFromCart = (bookId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.book.id !== bookId))
-  }
+    setCart((prevCart) => prevCart.filter((item) => item.book.id !== bookId));
+  };
 
   const updateQuantity = (bookId: string, quantity: number) => {
     setCart((prevCart) =>
       prevCart.map((item) =>
-        item.book.id === bookId ? { ...item, quantity: Math.max(1, quantity) } : item
+        item.book.id === bookId
+          ? { ...item, quantity: Math.max(1, quantity) }
+          : item
       )
-    )
-  }
+    );
+  };
 
-  const cartTotal = cart.reduce((total, item) => total + item.book.price * item.quantity, 0)
-  const cartItemCount = cart.reduce((count, item) => count + item.quantity, 0)
+  const cartTotal = cart.reduce(
+    (total, item) => total + item.book.price * item.quantity,
+    0
+  );
+  const cartItemCount = cart.reduce((count, item) => count + item.quantity, 0);
 
   // Handle completed purchase
   const handlePurchaseComplete = (purchasedItems: CartItem[]) => {
     // Add purchased books to purchasedBooks state
-    const newPurchasedBooks = purchasedItems.map((item) => item.book)
-    setPurchasedBooks((prev) => [...prev, ...newPurchasedBooks])
+    const newPurchasedBooks = purchasedItems.map((item) => item.book);
+    setPurchasedBooks((prev) => [...prev, ...newPurchasedBooks]);
 
     // Clear cart
-    setCart([])
-  }
+    setCart([]);
+  };
 
   // Add a purchased book to collection
   const addToCollection = (book: StoreBookType) => {
     const newCollectionBook: BookType = {
       ...book,
-    }
+    };
 
     // Check if book already exists in collection
     if (!collectionBooks.some((b) => b.id === book.id)) {
-      setCollectionBooks((prev) => [...prev, newCollectionBook])
+      setCollectionBooks((prev) => [...prev, newCollectionBook]);
 
       // Remove from purchased books
-      setPurchasedBooks((prev) => prev.filter((b) => b.id !== book.id))
+      setPurchasedBooks((prev) => prev.filter((b) => b.id !== book.id));
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between my-3">
         <div className="flex items-center gap-6">
-          <Tabs value={activeView} onValueChange={(value) => setActiveView(value as "collection" | "store")}>
+          <Tabs
+            value={activeView}
+            onValueChange={(value) =>
+              setActiveView(value as "collection" | "store")
+            }
+          >
             <TabsList>
-              <TabsTrigger value="collection" className="flex items-center gap-1 cursor-pointer">
+              <TabsTrigger
+                value="collection"
+                className="flex items-center gap-1 cursor-pointer"
+              >
                 <BookOpen className="h-4 w-4" />
                 <span className="hidden sm:inline">My Collection</span>
               </TabsTrigger>
-              <TabsTrigger value="store" className="flex items-center gap-1 cursor-pointer">
+              <TabsTrigger
+                value="store"
+                className="flex items-center gap-1 cursor-pointer"
+              >
                 <BookMarked className="h-4 w-4" />
                 <span className="hidden sm:inline">Book Store</span>
               </TabsTrigger>
@@ -262,7 +275,11 @@ function BookPage() {
 
       <main>
         {activeView === "collection" ? (
-          <CollectionView books={collectionBooks} purchasedBooks={purchasedBooks} addToCollection={addToCollection} />
+          <CollectionView
+            books={collectionBooks}
+            purchasedBooks={purchasedBooks}
+            addToCollection={addToCollection}
+          />
         ) : (
           <StoreView books={storeBooks} addToCart={addToCart} />
         )}
@@ -274,7 +291,7 @@ function BookPage() {
         </div>
       </footer> */}
     </div>
-  )
+  );
 }
 
-export default BookPage
+export default BookPage;

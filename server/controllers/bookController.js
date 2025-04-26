@@ -8,8 +8,8 @@ dotenv.config();
 const pinata = new PinataSDK({
   pinataJwt: process.env.PINATA_JWT,
   pinataGateway: process.env.GATEWAY_URL,
-  pinataGatewayKey: process.GATEWAY_KEY,
 });
+// pinataGatewayKey: process.GATEWAY_KEY,
 
 const uploadBook = async (req, res) => {
   try {

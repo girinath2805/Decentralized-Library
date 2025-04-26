@@ -99,9 +99,9 @@ const PublishBook = () => {
       } else {
         const cid = response.data.cid;
         const uri = `${import.meta.env.VITE_IPFS_GATEWAY}/${cid}`;
-        const priceInTinybars = ethers.parseUnits(price.toString(), 8);
-        const txn = await contract.uploadBook(uri, priceInTinybars);
-        txn.wait();
+        const priceInWei = ethers.parseUnits(price.toString(), 18);
+        const txn = await contract.uploadBook(uri, priceInWei);
+        await txn.wait();
         toast.success("Book uploaded succesfully");
       }
     } catch (err) {
