@@ -1,9 +1,9 @@
-import type { CollectionBookType } from "../../types"
+import type { BookType } from "../../types"
 import { Card, CardContent } from "../ui/card"
 import { Badge } from "../ui/badge"
 
 interface CollectionBookGridProps {
-  books: CollectionBookType[]
+  books: BookType[]
 }
 
 export function CollectionBookGrid({ books }: CollectionBookGridProps) {

@@ -6,10 +6,10 @@ import { Button } from "../ui/button"
 
 interface StoreBookListProps {
   books: StoreBookType[]
-  addToCart: (book: StoreBookType) => void
+  onPurchase: (book: StoreBookType) => void
 }
 
-export function StoreBookList({ books, addToCart }: StoreBookListProps) {
+export function StoreBookList({ books, onPurchase }: StoreBookListProps) {
   return (
     <div className="space-y-4">
       {books.map((book) => (
@@ -30,15 +30,11 @@ export function StoreBookList({ books, addToCart }: StoreBookListProps) {
                   <p className="text-muted-foreground">{book.author}</p>
                   <p className="text-sm text-muted-foreground">{book.year}</p>
                 </div>
-                <div className="flex items-center justify-between mt-2">
-                  <div className="flex items-center">
-                    <Star className="h-4 w-4 fill-primary text-primary mr-1" />
-                    <span>{book.rating.toFixed(1)}</span>
-                  </div>
+                <div className="flex items-center justify-end mt-2">
                   <div className="flex items-center gap-4">
                     <div className="font-medium">${book.price.toFixed(2)}</div>
-                    <Button size="sm" onClick={() => addToCart(book)} disabled={book.stock === 0}>
-                      {book.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                    <Button size="sm" onClick={() => onPurchase(book)}>
+                      Buy Now
                     </Button>
                   </div>
                 </div>

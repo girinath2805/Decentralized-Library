@@ -5,10 +5,10 @@ import { Button } from "../ui/button"
 
 interface StoreBookGridProps {
   books: StoreBookType[]
-  addToCart: (book: StoreBookType) => void
+  onPurchase: (book: StoreBookType) => void
 }
 
-export function StoreBookGrid({ books, addToCart }: StoreBookGridProps) {
+export function StoreBookGrid({ books, onPurchase }: StoreBookGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {books.map((book) => (
@@ -29,8 +29,8 @@ export function StoreBookGrid({ books, addToCart }: StoreBookGridProps) {
           <CardFooter className="pt-0 flex justify-end items-center">
             <div className="text-right">
               <div className="font-medium mb-1">${book.price.toFixed(2)}</div>
-              <Button size="sm" onClick={() => addToCart(book)} disabled={book.stock === 0}>
-                {book.stock > 0 ? "Add to Cart" : "Out of Stock"}
+              <Button size="sm" onClick={() => onPurchase(book)}>
+                Buy Now
               </Button>
             </div>
           </CardFooter>

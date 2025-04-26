@@ -33,10 +33,6 @@ export function PurchasedBooks({ books, addToCollection }: PurchasedBooksProps) 
               <p className="text-sm text-muted-foreground">{book.year}</p>
             </CardContent>
             <CardFooter className="pt-0 flex justify-between items-center">
-              <div className="flex items-center">
-                <Star className="h-4 w-4 fill-primary text-primary mr-1" />
-                <span>{book.rating.toFixed(1)}</span>
-              </div>
               <Button
                 size="sm"
                 variant="outline"

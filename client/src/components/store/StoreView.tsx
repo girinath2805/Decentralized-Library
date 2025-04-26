@@ -9,10 +9,10 @@ import type { StoreBookType } from "../../types"
 
 interface StoreViewProps {
   books: StoreBookType[]
-  addToCart: (book: StoreBookType) => void
+  onPurchase: (book: StoreBookType) => void
 }
 
-export function StoreView({ books, addToCart }: StoreViewProps) {
+export function StoreView({ books, onPurchase }: StoreViewProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
@@ -76,9 +76,9 @@ export function StoreView({ books, addToCart }: StoreViewProps) {
       ) : (
         <>
           {viewMode === "grid" ? (
-            <StoreBookGrid books={currentBooks} addToCart={addToCart} />
+            <StoreBookGrid books={currentBooks} onPurchase={onPurchase} />
           ) : (
-            <StoreBookList books={currentBooks} addToCart={addToCart} />
+            <StoreBookList books={currentBooks} onPurchase={onPurchase} />
           )}
 
           <div className="mt-8">
