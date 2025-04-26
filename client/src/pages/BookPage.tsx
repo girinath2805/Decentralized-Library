@@ -158,15 +158,15 @@ function BookPage() {
   // Handle book purchase
   const handlePurchaseComplete = () => {
     if (selectedBook) {
-      // Add directly to collection
       const newCollectionBook: BookType = {
         ...selectedBook,
       };
 
-      // Check if book already exists in collection
       if (!collectionBooks.some((b) => b.id === selectedBook.id)) {
         setCollectionBooks((prev) => [...prev, newCollectionBook]);
       }
+      setStoreBooks((prev) => prev.filter((book) => book.id !== selectedBook.id))
+
       setIsPurchaseModalOpen(false);
       setSelectedBook(null);
       setActiveView("collection");
