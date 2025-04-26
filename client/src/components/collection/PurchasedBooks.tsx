@@ -21,7 +21,7 @@ export function PurchasedBooks({ books, addToCollection }: PurchasedBooksProps) 
           <Card key={book.id} className="overflow-hidden h-full flex flex-col">
             <div className="relative pt-4 px-4">
               <img
-                src={book.coverUrl || "/placeholder.svg"}
+                src={"/cover.webp"}
                 alt={`Cover of ${book.title}`}
                 className="w-full h-[250px] object-cover rounded-md"
               />

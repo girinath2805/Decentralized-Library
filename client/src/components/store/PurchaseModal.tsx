@@ -84,7 +84,7 @@ export function PurchaseModal({
             </DialogHeader>
             <div className="flex items-center gap-4 py-4">
               <img
-                src={book.coverUrl || "/placeholder.svg"}
+                src={"/cover.webp"}
                 alt={book.title}
                 className="w-16 h-24 object-cover rounded"
               />
@@ -110,9 +110,9 @@ export function PurchaseModal({
             </DialogHeader>
             <div className="flex items-center gap-4 py-4">
               <img
-                src={book.coverUrl || "/placeholder.svg"}
+                src={"/cover.webp"}
                 alt={book.title}
-                className="w-16 h-24 object-cover rounded"
+                className="w-fit h-20 object-cover rounded"
               />
               <div>
                 <h3 className="font-medium">{book.title}</h3>
