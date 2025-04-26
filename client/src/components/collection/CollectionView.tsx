@@ -5,22 +5,17 @@ import SearchFilters from "../SearchFilters"
 import Pagination from "../Pagination"
 import { Button } from "../ui/button"
 import { LayoutGrid, List } from "lucide-react"
-import type { BookType, StoreBookType } from "../../types"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
-import { PurchasedBooks } from "./PurchasedBooks"
+import type { BookType } from "../../types"
 
 interface CollectionViewProps {
   books: BookType[]
-  purchasedBooks: StoreBookType[]
-  addToCollection: (book: StoreBookType) => void
 }
 
-export function CollectionView({ books, purchasedBooks, addToCollection }: CollectionViewProps) {
+export function CollectionView({ books }: CollectionViewProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<"collection" | "purchased">("collection")
 
   // Filter books based on search term and genre
   const filteredBooks = books.filter((book) => {
@@ -41,22 +36,9 @@ export function CollectionView({ books, purchasedBooks, addToCollection }: Colle
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "collection" | "purchased")}>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <div className="flex flex-col gap-4">
-            <h1 className="text-3xl font-bold">My Books</h1>
-            <TabsList>
-              <TabsTrigger value="collection">My Collection</TabsTrigger>
-              {purchasedBooks.length > 0 && (
-                <TabsTrigger value="purchased">
-                  Recently Purchased
-                  {purchasedBooks.length > 0 && <Badge className="ml-2">{purchasedBooks.length}</Badge>}
-                </TabsTrigger>
-              )}
-            </TabsList>
-          </div>
 
-          {activeTab === "collection" && (
+        <h1 className="text-3xl font-bold">My Collection</h1>
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">View:</span>
               <Button
@@ -76,10 +58,7 @@ export function CollectionView({ books, purchasedBooks, addToCollection }: Colle
                 <List className="h-4 w-4" />
               </Button>
             </div>
-          )}
         </div>
-
-        <TabsContent value="collection" className="mt-0">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <SearchFilters
               searchTerm={searchTerm}
@@ -107,20 +86,6 @@ export function CollectionView({ books, purchasedBooks, addToCollection }: Colle
               </div>
             </>
           )}
-        </TabsContent>
-
-        <TabsContent value="purchased" className="mt-0">
-          {purchasedBooks.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">No recently purchased books.</p>
-            </div>
-          ) : (
-            <PurchasedBooks books={purchasedBooks} addToCollection={addToCollection} />
-          )}
-        </TabsContent>
-      </Tabs>
     </div>
   )
 }
-
-import { Badge } from "../ui/badge"

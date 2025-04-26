@@ -17,7 +17,6 @@ function BookPage() {
   );
   const [collectionBooks, setCollectionBooks] = useState<BookType[]>([]);
   const [storeBooks, setStoreBooks] = useState<StoreBookType[]>([]);
-  const [purchasedBooks, setPurchasedBooks] = useState<StoreBookType[]>([]);
   const [selectedBook, setSelectedBook] = useState<StoreBookType | null>(null)
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false)
   const { account, provider, network, isConnected } = useWallet();
@@ -150,35 +149,29 @@ function BookPage() {
       return null;
     }
   }
-  // Handle book purchase
+
   const handlePurchase = (book: StoreBookType) => {
     setSelectedBook(book)
     setIsPurchaseModalOpen(true)
   }
 
-  // Handle purchase completion
+  // Handle book purchase
   const handlePurchaseComplete = () => {
     if (selectedBook) {
-      setPurchasedBooks((prev) => [...prev, selectedBook])
+      // Add directly to collection
+      const newCollectionBook: BookType = {
+        ...selectedBook,
+      }
+
+      // Check if book already exists in collection
+      if (!collectionBooks.some((b) => b.id === selectedBook.id)) {
+        setCollectionBooks((prev) => [...prev, newCollectionBook])
+      }
       setIsPurchaseModalOpen(false)
       setSelectedBook(null)
+      setActiveView("collection")
     }
   }
-
-  // Add a purchased book to collection
-  const addToCollection = (book: StoreBookType) => {
-    const newCollectionBook: BookType = {
-      ...book,
-    };
-
-    // Check if book already exists in collection
-    if (!collectionBooks.some((b) => b.id === book.id)) {
-      setCollectionBooks((prev) => [...prev, newCollectionBook]);
-
-      // Remove from purchased books
-      setPurchasedBooks((prev) => prev.filter((b) => b.id !== book.id));
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -212,7 +205,7 @@ function BookPage() {
 
       <main>
         {activeView === "collection" ? (
-          <CollectionView books={collectionBooks} purchasedBooks={purchasedBooks} addToCollection={addToCollection} />
+          <CollectionView books={collectionBooks} />
         ) : (
           <StoreView books={storeBooks} onPurchase={handlePurchase} />
         )}

@@ -1,7 +1,6 @@
 import type { StoreBookType } from "../../types"
 import { Card, CardContent } from "../ui/card"
 import { Badge } from "../ui/badge"
-import { Star } from "lucide-react"
 import { Button } from "../ui/button"
 
 interface StoreBookListProps {
