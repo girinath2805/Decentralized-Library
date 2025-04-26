@@ -1,38 +1,22 @@
 import mongoose from "mongoose"
 
 const bookSchema = new mongoose.Schema({
-    title:{
+    bookId:{
         type:String,
         required:true,
     },
-    author:{
+    ownerAddress:{
         type:String,
         required:true,
     },
-    coverUrl:{
-        type:String,
-    },
-    year:{
+    price:{
         type:Number,
+        required:true,
     },
-    genre:{
-        type:String,
-    },
-    rating:{
-        type:Number,
-    },
-    ipfscid:{
+    uri:{
         type:String,
         required:true,
     },
-    aesEncryptedKey:{
-        type:String,
-        required:true,
-    },
-    bookTokenId:{
-        type:String,
-        required:true,
-    }
 }, { timestamps:true })
 
 const Book = mongoose.model("Book", bookSchema)
