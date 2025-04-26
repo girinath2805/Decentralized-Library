@@ -4,6 +4,7 @@ import cors from "cors"
 import bookRoutes from "./routes/bookRoutes.js"
 import userRoutes from "./routes/userRoutes.js"
 import connectDB from "./db/connectDB.js"
+import { listenToBookUploaded } from "./listeners/bookUploadListener.js"
 
 const app = express()
 dotenv.config()
@@ -11,7 +12,9 @@ dotenv.config()
 const PORT = process.env.PORT || 5000
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000/'  
 
-connectDB()
+connectDB().then(() => {
+    listenToBookUploaded()
+})
 
 app.use(cors({
     origin:FRONTEND_URL,
