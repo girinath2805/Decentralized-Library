@@ -7,18 +7,10 @@ export interface BookType {
   coverUrl: string
   year: number
   genre: string
-  rating: number
 }
 
 export interface StoreBookType extends BookType {
   price: number
-  stock: number
-}
-
-export interface CollectionBookType extends BookType {
-  dateAdded: string
-  notes?: string
-  readStatus: "unread" | "reading" | "completed"
 }
 
 export interface CartItem {

@@ -1,10 +1,9 @@
-import type { CollectionBookType } from "../../types"
+import type { BookType } from "../../types"
 import { Card, CardContent } from "../ui/card"
 import { Badge } from "../ui/badge"
-import { Star, BookOpen, BookText, CheckCircle } from "lucide-react"
 
 interface CollectionBookListProps {
-  books: CollectionBookType[]
+  books: BookType[]
 }
 
 export function CollectionBookList({ books }: CollectionBookListProps) {
@@ -13,7 +12,7 @@ export function CollectionBookList({ books }: CollectionBookListProps) {
       {books.map((book) => (
         <Card key={book.id}>
           <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 cursor-pointer">
               <img
                 src={book.coverUrl || "/placeholder.svg"}
                 alt={`Cover of ${book.title}`}
@@ -27,34 +26,8 @@ export function CollectionBookList({ books }: CollectionBookListProps) {
                   </div>
                   <p className="text-muted-foreground">{book.author}</p>
                   <p className="text-sm text-muted-foreground">{book.year}</p>
-                  <p className="text-sm text-muted-foreground">Added: {book.dateAdded}</p>
-                  {book.notes && <p className="text-sm mt-2 italic">{book.notes}</p>}
                 </div>
                 <div className="flex items-center justify-between mt-2">
-                  <div className="flex items-center">
-                    <Star className="h-4 w-4 fill-primary text-primary mr-1" />
-                    <span>{book.rating.toFixed(1)}</span>
-                  </div>
-                  <div>
-                    {book.readStatus === "unread" && (
-                      <Badge variant="outline" className="flex items-center gap-1">
-                        <BookOpen className="h-3 w-3" />
-                        <span>Unread</span>
-                      </Badge>
-                    )}
-                    {book.readStatus === "reading" && (
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <BookText className="h-3 w-3" />
-                        <span>Reading</span>
-                      </Badge>
-                    )}
-                    {book.readStatus === "completed" && (
-                      <Badge variant="default" className="flex items-center gap-1">
-                        <CheckCircle className="h-3 w-3" />
-                        <span>Completed</span>
-                      </Badge>
-                    )}
-                  </div>
                 </div>
               </div>
             </div>

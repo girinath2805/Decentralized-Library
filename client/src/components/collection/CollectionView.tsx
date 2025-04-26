@@ -5,12 +5,12 @@ import SearchFilters from "../SearchFilters"
 import Pagination from "../Pagination"
 import { Button } from "../ui/button"
 import { LayoutGrid, List } from "lucide-react"
-import type { CollectionBookType, StoreBookType } from "../../types"
+import type { BookType, StoreBookType } from "../../types"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { PurchasedBooks } from "./PurchasedBooks"
 
 interface CollectionViewProps {
-  books: CollectionBookType[]
+  books: BookType[]
   purchasedBooks: StoreBookType[]
   addToCollection: (book: StoreBookType) => void
 }

@@ -5,7 +5,12 @@ dotenv.config()
 
 const getPurchasedBooks = async (req, res) => {
     try {
-        const address = req.body;
+        const address = req.query.address;
+
+        if(!address){
+            return res.status(400).json({ error: "Address is required" });
+        }
+
         const user = await User.findOne({ address }).populate("purchased");
 
         if (!user) {

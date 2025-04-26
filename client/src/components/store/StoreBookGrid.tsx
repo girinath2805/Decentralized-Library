@@ -1,7 +1,6 @@
 import type { StoreBookType } from "../../types"
 import { Card, CardContent, CardFooter } from "../ui/card"
 import { Badge } from "../ui/badge"
-import { Star } from "lucide-react"
 import { Button } from "../ui/button"
 
 interface StoreBookGridProps {
@@ -27,13 +26,9 @@ export function StoreBookGrid({ books, addToCart }: StoreBookGridProps) {
             <p className="text-muted-foreground">{book.author}</p>
             <p className="text-sm text-muted-foreground">{book.year}</p>
           </CardContent>
-          <CardFooter className="pt-0 flex justify-between items-center">
-            <div className="flex items-center">
-              <Star className="h-4 w-4 fill-primary text-primary mr-1" />
-              <span>{book.rating.toFixed(1)}</span>
-            </div>
+          <CardFooter className="pt-0 flex justify-end items-center">
             <div className="text-right">
-              <div className="font-medium">${book.price.toFixed(2)}</div>
+              <div className="font-medium mb-1">${book.price.toFixed(2)}</div>
               <Button size="sm" onClick={() => addToCart(book)} disabled={book.stock === 0}>
                 {book.stock > 0 ? "Add to Cart" : "Out of Stock"}
               </Button>

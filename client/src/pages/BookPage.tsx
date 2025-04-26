@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { CollectionView } from "@/components/collection/CollectionView"
 import { StoreView } from "@/components/store/StoreView"
 import { ShoppingCart } from "lucide-react"
@@ -7,8 +7,10 @@ import { Badge } from "@/components/ui/badge"
 import { ShoppingCart as CartComponent } from "@/components/store/ShoppingCart"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BookOpen, BookMarked } from "lucide-react"
-import type { CartItem, CollectionBookType, StoreBookType } from "../types"
+import type { CartItem, BookType, StoreBookType } from "../types"
 import axios from "axios"
+import { useWallet } from "@/context/WalletContext"
+import { toast } from "sonner"
 
 // Sample store books data
 const sampleStoreBooks: StoreBookType[] = [
@@ -19,9 +21,7 @@ const sampleStoreBooks: StoreBookType[] = [
     coverUrl: "/placeholder.svg?height=250&width=180",
     year: 1925,
     genre: "Classic",
-    rating: 4.5,
     price: 12.99,
-    stock: 15,
   },
   {
     id: "2",
@@ -30,9 +30,7 @@ const sampleStoreBooks: StoreBookType[] = [
     coverUrl: "/placeholder.svg?height=250&width=180",
     year: 1960,
     genre: "Fiction",
-    rating: 4.8,
     price: 14.99,
-    stock: 8,
   },
   {
     id: "3",
@@ -41,9 +39,7 @@ const sampleStoreBooks: StoreBookType[] = [
     coverUrl: "/placeholder.svg?height=250&width=180",
     year: 1949,
     genre: "Dystopian",
-    rating: 4.6,
     price: 11.99,
-    stock: 12,
   },
   {
     id: "4",
@@ -52,9 +48,7 @@ const sampleStoreBooks: StoreBookType[] = [
     coverUrl: "/placeholder.svg?height=250&width=180",
     year: 1937,
     genre: "Fantasy",
-    rating: 4.7,
     price: 15.99,
-    stock: 20,
   },
   {
     id: "5",
@@ -63,9 +57,7 @@ const sampleStoreBooks: StoreBookType[] = [
     coverUrl: "/placeholder.svg?height=250&width=180",
     year: 1813,
     genre: "Romance",
-    rating: 4.4,
     price: 9.99,
-    stock: 5,
   },
   {
     id: "6",
@@ -74,14 +66,12 @@ const sampleStoreBooks: StoreBookType[] = [
     coverUrl: "/placeholder.svg?height=250&width=180",
     year: 1951,
     genre: "Coming-of-age",
-    rating: 4.2,
     price: 13.99,
-    stock: 10,
   },
 ]
 
 // Sample collection books data
-const sampleCollectionBooks: CollectionBookType[] = [
+const sampleCollectionBooks: BookType[] = [
   {
     id: "101",
     title: "Harry Potter and the Philosopher's Stone",
@@ -89,9 +79,6 @@ const sampleCollectionBooks: CollectionBookType[] = [
     coverUrl: "/placeholder.svg?height=250&width=180",
     year: 1997,
     genre: "Fantasy",
-    rating: 4.7,
-    dateAdded: "2023-01-15",
-    readStatus: "completed",
   },
   {
     id: "102",
@@ -100,9 +87,6 @@ const sampleCollectionBooks: CollectionBookType[] = [
     coverUrl: "/placeholder.svg?height=250&width=180",
     year: 1954,
     genre: "Fantasy",
-    rating: 4.9,
-    dateAdded: "2023-02-20",
-    readStatus: "completed",
   },
   {
     id: "103",
@@ -111,10 +95,6 @@ const sampleCollectionBooks: CollectionBookType[] = [
     coverUrl: "/placeholder.svg?height=250&width=180",
     year: 1965,
     genre: "Science Fiction",
-    rating: 4.5,
-    dateAdded: "2023-03-10",
-    readStatus: "reading",
-    notes: "Currently on chapter 15",
   },
 ]
 
@@ -122,13 +102,62 @@ function BookPage() {
   const [activeView, setActiveView] = useState<"collection" | "store">("collection")
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
-  const [collectionBooks, setCollectionBooks] = useState<CollectionBookType[]>(sampleCollectionBooks)
+  const [collectionBooks, setCollectionBooks] = useState<BookType[]>(sampleCollectionBooks)
   const [storeBooks, setStoreBooks] = useState<StoreBookType[]>(sampleStoreBooks)
   const [purchasedBooks, setPurchasedBooks] = useState<StoreBookType[]>([])
 
-  const getBooksCollection = async() => {
-    const books = await axios.get('/api/book/')
-  }
+  const { account } = useWallet();
+
+  useEffect(() => {
+    const getBooksCollection = async () => {
+      try {
+        if (!account) {
+          toast.error("Connect wallet");
+          return;
+        }
+        const response = await axios.get('/api/users/purchased', {
+          params: { address: account }
+        })
+
+        if (response.data.error) {
+          toast.error(response.data.error)
+        } else {
+          setCollectionBooks(response.data)
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          toast.error(error.response.data.error)
+        } else {
+          toast.error("An error occurred while getting books collection. Please try again.")
+        }
+      }
+    }
+
+    const getStoreBooks = async () => {
+      try {
+        const response = await axios.get('/api/books/allbooks')
+        if (response.data.error) {
+          toast.error(response.data.error)
+        } else {
+          const filtered = response.data.filter((storeBook: StoreBookType) =>
+            !collectionBooks.some((colBook) => colBook.id === storeBook.id)
+          );
+          setStoreBooks(filtered);
+        }
+
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          toast.error(error.response.data.error)
+        } else {
+          toast.error("An error occurred while getting books collection. Please try again.")
+        }
+      }
+    }
+
+    getBooksCollection().then(getStoreBooks);
+
+  }, [account])
+
 
   // Cart functions
   const addToCart = (book: StoreBookType) => {
@@ -136,7 +165,7 @@ function BookPage() {
       const existingItem = prevCart.find((item) => item.book.id === book.id)
       if (existingItem) {
         return prevCart.map((item) =>
-          item.book.id === book.id ? { ...item, quantity: Math.min(item.quantity + 1, book.stock) } : item,
+          item.book.id === book.id ? { ...item, quantity: item.quantity + 1 } : item,
         )
       } else {
         return [...prevCart, { book, quantity: 1 }]
@@ -150,14 +179,9 @@ function BookPage() {
 
   const updateQuantity = (bookId: string, quantity: number) => {
     setCart((prevCart) =>
-      prevCart.map((item) => {
-        if (item.book.id === bookId) {
-          const book = storeBooks.find((b) => b.id === bookId)
-          const maxStock = book ? book.stock : 1
-          return { ...item, quantity: Math.min(Math.max(1, quantity), maxStock) }
-        }
-        return item
-      }),
+      prevCart.map((item) =>
+        item.book.id === bookId ? { ...item, quantity: Math.max(1, quantity) } : item
+      )
     )
   }
 
@@ -176,10 +200,8 @@ function BookPage() {
 
   // Add a purchased book to collection
   const addToCollection = (book: StoreBookType) => {
-    const newCollectionBook: CollectionBookType = {
+    const newCollectionBook: BookType = {
       ...book,
-      dateAdded: new Date().toISOString().split("T")[0],
-      readStatus: "unread",
     }
 
     // Check if book already exists in collection
@@ -193,50 +215,50 @@ function BookPage() {
 
   return (
     <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between my-3">
-          <div className="flex items-center gap-6">
-            <Tabs value={activeView} onValueChange={(value) => setActiveView(value as "collection" | "store")}>
-              <TabsList>  
-                <TabsTrigger value="collection" className="flex items-center gap-1 cursor-pointer">
-                  <BookOpen className="h-4 w-4" />
-                  <span className="hidden sm:inline">My Collection</span>
-                </TabsTrigger>
-                <TabsTrigger value="store" className="flex items-center gap-1 cursor-pointer">
-                  <BookMarked className="h-4 w-4" />
-                  <span className="hidden sm:inline">Book Store</span>
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-            <div className="relative">
-              <Button
-                variant="outline"
-                size="icon"
-                className="relative"
-                onClick={() => setIsCartOpen(!isCartOpen)}
-                aria-label="Shopping cart"
-              >
-                <ShoppingCart className="h-5 w-5" />
-                {cartItemCount > 0 && (
-                  <Badge className="absolute -top-2 -right-2 px-1.5 py-0.5 min-w-[1.25rem] min-h-[1.25rem] flex items-center justify-center">
-                    {cartItemCount}
-                  </Badge>
-                )}
-              </Button>
-              {isCartOpen && (
-                <div className="absolute right-0 mt-2 w-80 z-50">
-                  <CartComponent
-                    cart={cart}
-                    total={cartTotal}
-                    removeFromCart={removeFromCart}
-                    updateQuantity={updateQuantity}
-                    onClose={() => setIsCartOpen(false)}
-                    onPurchaseComplete={handlePurchaseComplete}
-                  />
-                </div>
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between my-3">
+        <div className="flex items-center gap-6">
+          <Tabs value={activeView} onValueChange={(value) => setActiveView(value as "collection" | "store")}>
+            <TabsList>
+              <TabsTrigger value="collection" className="flex items-center gap-1 cursor-pointer">
+                <BookOpen className="h-4 w-4" />
+                <span className="hidden sm:inline">My Collection</span>
+              </TabsTrigger>
+              <TabsTrigger value="store" className="flex items-center gap-1 cursor-pointer">
+                <BookMarked className="h-4 w-4" />
+                <span className="hidden sm:inline">Book Store</span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <div className="relative">
+            <Button
+              variant="outline"
+              size="icon"
+              className="relative"
+              onClick={() => setIsCartOpen(!isCartOpen)}
+              aria-label="Shopping cart"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {cartItemCount > 0 && (
+                <Badge className="absolute -top-2 -right-2 px-1.5 py-0.5 min-w-[1.25rem] min-h-[1.25rem] flex items-center justify-center">
+                  {cartItemCount}
+                </Badge>
               )}
-            </div>
+            </Button>
+            {isCartOpen && (
+              <div className="absolute right-0 mt-2 w-80 z-50">
+                <CartComponent
+                  cart={cart}
+                  total={cartTotal}
+                  removeFromCart={removeFromCart}
+                  updateQuantity={updateQuantity}
+                  onClose={() => setIsCartOpen(false)}
+                  onPurchaseComplete={handlePurchaseComplete}
+                />
+              </div>
+            )}
           </div>
         </div>
+      </div>
 
       <main>
         {activeView === "collection" ? (
