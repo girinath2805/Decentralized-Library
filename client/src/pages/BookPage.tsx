@@ -24,8 +24,8 @@ function BookPage() {
   useEffect(() => {
     const getBooksCollection = async () => {
       try {
-        if (!account) {
-          toast.error("Connect wallet");
+        if (!isConnected || !account || !provider) {
+          toast.error("Waiting for wallet connection...");
           return;
         }
         // const response = await axios.get("/api/users/purchased", {
@@ -89,8 +89,8 @@ function BookPage() {
         //   );
         //   setStoreBooks(filtered);
         // }
-        if (!account || !provider) {
-          toast.error("Connect wallet");
+        if (!isConnected || !account || !provider) {
+          toast.error("Waiting for wallet connection...");
           return;
         }
 
@@ -138,7 +138,7 @@ function BookPage() {
     };
 
     getBooksCollection().then(getStoreBooks);
-  }, [account]);
+  }, [account, isConnected, provider]);
 
   async function fetchMetadata(url: string) {
     try {

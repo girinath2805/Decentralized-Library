@@ -32,7 +32,7 @@ const SearchFilters = ({
       </div>
 
       <div className="w-full sm:w-48">
-        <Select value={selectedGenre || ""} onValueChange={(value) => onGenreChange(value === "" ? null : value)}>
+        <Select value={selectedGenre || "all"} onValueChange={(value) => onGenreChange(value === "all" ? null : value)}>
           <SelectTrigger>
             <SelectValue placeholder="All Genres" />
           </SelectTrigger>
