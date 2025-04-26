@@ -64,9 +64,9 @@ export function CollectionBookGrid({ books }: CollectionBookGridProps) {
         >
           <div className="relative pt-4 px-4">
             <img
-              src={book.coverUrl || "/placeholder.svg"}
+              src={"/coverown.jpg"}
               alt={`Cover of ${book.title}`}
-              className="w-full h-[250px] object-cover rounded-md"
+              className="w-full h-fit object-cover rounded-md"
             />
             <Badge className="absolute top-6 right-6">{book.genre}</Badge>
           </div>

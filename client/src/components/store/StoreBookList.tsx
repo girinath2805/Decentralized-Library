@@ -16,9 +16,9 @@ export function StoreBookList({ books, onPurchase }: StoreBookListProps) {
           <CardContent className="p-4">
             <div className="flex flex-col sm:flex-row gap-4">
               <img
-                src={book.coverUrl || "/placeholder.svg"}
+                src={"/cover.webp"}
                 alt={`Cover of ${book.title}`}
-                className="w-[100px] h-[150px] object-cover rounded-md"
+                className="w-auto h-[150px] object-cover rounded-md"
               />
               <div className="flex flex-col justify-between flex-grow">
                 <div>
