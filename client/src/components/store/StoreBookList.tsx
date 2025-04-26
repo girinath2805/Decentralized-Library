@@ -9,7 +9,6 @@ interface StoreBookListProps {
 }
 
 export function StoreBookList({ books, onPurchase }: StoreBookListProps) {
-  console.log(books[1].price);
   return (
     <div className="space-y-4">
       {books.map((book) => (
@@ -33,7 +32,7 @@ export function StoreBookList({ books, onPurchase }: StoreBookListProps) {
                 <div className="flex items-center justify-end mt-2">
                   <div className="flex items-center gap-4">
                     <div className="font-medium">
-                      {(book.price/1e8).toFixed(2)} HBAR
+                      {(book.price / 1e8).toFixed(2)} HBAR
                     </div>
                     <Button size="sm" onClick={() => onPurchase(book)}>
                       Buy Now

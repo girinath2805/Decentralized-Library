@@ -163,7 +163,7 @@ const PublishBook = () => {
             <Input
               id="Price"
               type="text"
-              placeholder="Price"
+              placeholder="Price in HBAR"
               onChange={(e) => setPrice(e.target.value)}
             />
           </div>
