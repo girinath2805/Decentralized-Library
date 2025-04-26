@@ -88,14 +88,20 @@ const PublishBook = () => {
       const metadataFile = new File([metadataJson], "metadata.json", {
         type: "application/json",
       });
-      const response = await axios.post("/api/books/upload", metadataFile);
+      const formData = new FormData();
+      formData.append("file", metadataFile);
+
+      const response = await axios.post("/api/books/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       if (response.data.error) {
         toast.error(response.data.error);
       } else {
         const cid = response.data.cid;
         const uri = `${import.meta.env.VITE_IPFS_GATEWAY}/${cid}`;
         const priceInTinybars = ethers.parseUnits(price.toString(), 8);
-        const txn = contract.uploadBook(uri, priceInTinybars);
+        const txn = await contract.uploadBook(uri, priceInTinybars);
+        txn.wait();
         toast.success("Book uploaded succesfully");
       }
     } catch (err) {
