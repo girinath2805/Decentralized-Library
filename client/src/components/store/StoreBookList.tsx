@@ -1,14 +1,15 @@
-import type { StoreBookType } from "../../types"
-import { Card, CardContent } from "../ui/card"
-import { Badge } from "../ui/badge"
-import { Button } from "../ui/button"
+import type { StoreBookType } from "../../types";
+import { Card, CardContent } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 
 interface StoreBookListProps {
-  books: StoreBookType[]
-  onPurchase: (book: StoreBookType) => void
+  books: StoreBookType[];
+  onPurchase: (book: StoreBookType) => void;
 }
 
 export function StoreBookList({ books, onPurchase }: StoreBookListProps) {
+  console.log(books[1].price);
   return (
     <div className="space-y-4">
       {books.map((book) => (
@@ -31,7 +32,9 @@ export function StoreBookList({ books, onPurchase }: StoreBookListProps) {
                 </div>
                 <div className="flex items-center justify-end mt-2">
                   <div className="flex items-center gap-4">
-                    <div className="font-medium">${book.price.toFixed(2)}</div>
+                    <div className="font-medium">
+                      {(book.price/1e8).toFixed(2)} HBAR
+                    </div>
                     <Button size="sm" onClick={() => onPurchase(book)}>
                       Buy Now
                     </Button>
@@ -43,5 +46,5 @@ export function StoreBookList({ books, onPurchase }: StoreBookListProps) {
         </Card>
       ))}
     </div>
-  )
+  );
 }

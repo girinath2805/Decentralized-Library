@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { ethers } from "ethers";
 import { abi } from "@/abi";
 import { PurchaseModal } from "@/components/store/PurchaseModal";
-import type { BookType, StoreBookType } from "@/types"
+import type { BookType, StoreBookType } from "@/types";
 
 function BookPage() {
   const [activeView, setActiveView] = useState<"collection" | "store">(
@@ -17,8 +17,8 @@ function BookPage() {
   );
   const [collectionBooks, setCollectionBooks] = useState<BookType[]>([]);
   const [storeBooks, setStoreBooks] = useState<StoreBookType[]>([]);
-  const [selectedBook, setSelectedBook] = useState<StoreBookType | null>(null)
-  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false)
+  const [selectedBook, setSelectedBook] = useState<StoreBookType | null>(null);
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const { account, provider, network, isConnected } = useWallet();
 
   useEffect(() => {
@@ -121,7 +121,7 @@ function BookPage() {
               metadata.coverUrl || "/placeholder.svg?height=250&width=180",
             year: parseInt(metadata.year),
             genre: metadata.genre,
-            price: parseFloat(ethers.formatEther(book.price)),
+            price: parseFloat(book.price),
           });
         }
 
@@ -151,9 +151,9 @@ function BookPage() {
   }
 
   const handlePurchase = (book: StoreBookType) => {
-    setSelectedBook(book)
-    setIsPurchaseModalOpen(true)
-  }
+    setSelectedBook(book);
+    setIsPurchaseModalOpen(true);
+  };
 
   // Handle book purchase
   const handlePurchaseComplete = () => {
@@ -161,17 +161,17 @@ function BookPage() {
       // Add directly to collection
       const newCollectionBook: BookType = {
         ...selectedBook,
-      }
+      };
 
       // Check if book already exists in collection
       if (!collectionBooks.some((b) => b.id === selectedBook.id)) {
-        setCollectionBooks((prev) => [...prev, newCollectionBook])
+        setCollectionBooks((prev) => [...prev, newCollectionBook]);
       }
-      setIsPurchaseModalOpen(false)
-      setSelectedBook(null)
-      setActiveView("collection")
+      setIsPurchaseModalOpen(false);
+      setSelectedBook(null);
+      setActiveView("collection");
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -216,8 +216,8 @@ function BookPage() {
           book={selectedBook}
           isOpen={isPurchaseModalOpen}
           onClose={() => {
-            setIsPurchaseModalOpen(false)
-            setSelectedBook(null)
+            setIsPurchaseModalOpen(false);
+            setSelectedBook(null);
           }}
           onPurchase={handlePurchaseComplete}
         />

@@ -1,39 +1,75 @@
-"use client"
+"use client";
 
-import { Button } from "../ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog"
-import type { StoreBookType } from "../../types"
-import { useState } from "react"
+import { Button } from "../ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import type { StoreBookType } from "../../types";
+import { useState } from "react";
+import { useWallet } from "@/context/WalletContext";
+import { toast } from "sonner";
+import { ethers } from "ethers";
+import { abi } from "@/abi";
 
 interface PurchaseModalProps {
-  book: StoreBookType
-  isOpen: boolean
-  onClose: () => void
-  onPurchase: () => void
+  book: StoreBookType;
+  isOpen: boolean;
+  onClose: () => void;
+  onPurchase: () => void;
 }
 
-export function PurchaseModal({ book, isOpen, onClose, onPurchase }: PurchaseModalProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isComplete, setIsComplete] = useState(false)
+export function PurchaseModal({
+  book,
+  isOpen,
+  onClose,
+  onPurchase,
+}: PurchaseModalProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  const { account, provider, network, isConnected } = useWallet();
+  const handlePurchase = async () => {
+    try {
+      if (!account || !provider) {
+        toast.error("Connect your wallet");
+        return;
+      }
 
-  const handlePurchase = () => {
-    setIsSubmitting(true)
+      setIsSubmitting(true);
 
-    // Simulate transaction processing
-    setTimeout(() => {
-      setIsSubmitting(false)
-      setIsComplete(true)
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(
+        import.meta.env.VITE_CONTRACT_ADDRESS,
+        abi,
+        signer
+      );
+      console.log(book.price);
+      const tx = await contract.purchaseBook(book.id, {
+        value: ethers.parseEther((book.price / 1e8).toString()),
+      });
 
-      // Call the onPurchase callback
-      onPurchase()
-    }, 1000)
-  }
+      await tx.wait(); // Wait for transaction to complete
+
+      toast.success("Book purchased successfully!");
+      setIsComplete(true);
+      onPurchase(); // callback to update UI
+    } catch (error) {
+      console.error(error);
+      toast.error("Purchase failed");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleClose = () => {
     // Reset state when closing
-    setIsComplete(false)
-    onClose()
-  }
+    setIsComplete(false);
+    onClose();
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -42,7 +78,9 @@ export function PurchaseModal({ book, isOpen, onClose, onPurchase }: PurchaseMod
           <>
             <DialogHeader>
               <DialogTitle>Purchase Complete!</DialogTitle>
-              <DialogDescription>Your transaction was successful.</DialogDescription>
+              <DialogDescription>
+                Your transaction was successful.
+              </DialogDescription>
             </DialogHeader>
             <div className="flex items-center gap-4 py-4">
               <img
@@ -53,7 +91,9 @@ export function PurchaseModal({ book, isOpen, onClose, onPurchase }: PurchaseMod
               <div>
                 <h3 className="font-medium">{book.title}</h3>
                 <p className="text-sm text-muted-foreground">{book.author}</p>
-                <p className="text-sm font-medium mt-1">${book.price.toFixed(2)}</p>
+                <p className="text-sm font-medium mt-1">
+                  ${book.price.toFixed(2)}
+                </p>
               </div>
             </div>
             <DialogFooter>
@@ -64,7 +104,9 @@ export function PurchaseModal({ book, isOpen, onClose, onPurchase }: PurchaseMod
           <>
             <DialogHeader>
               <DialogTitle>Confirm Purchase</DialogTitle>
-              <DialogDescription>Are you sure you want to purchase this book?</DialogDescription>
+              <DialogDescription>
+                Are you sure you want to purchase this book?
+              </DialogDescription>
             </DialogHeader>
             <div className="flex items-center gap-4 py-4">
               <img
@@ -75,7 +117,9 @@ export function PurchaseModal({ book, isOpen, onClose, onPurchase }: PurchaseMod
               <div>
                 <h3 className="font-medium">{book.title}</h3>
                 <p className="text-sm text-muted-foreground">{book.author}</p>
-                <p className="text-sm font-medium mt-1">${book.price.toFixed(2)}</p>
+                <p className="text-sm font-medium mt-1">
+                  ${book.price.toFixed(2)}
+                </p>
               </div>
             </div>
             <DialogFooter>
@@ -90,5 +134,5 @@ export function PurchaseModal({ book, isOpen, onClose, onPurchase }: PurchaseMod
         )}
       </DialogContent>
     </Dialog>
-  )
+  );
 }

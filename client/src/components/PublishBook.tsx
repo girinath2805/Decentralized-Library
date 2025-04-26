@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useWallet } from "@/context/WalletContext";
 import { abi } from "@/abi";
 import { ethers } from "ethers";
+import { useNavigate } from "react-router-dom";
 function FileIcon(props: any) {
   return (
     <svg
@@ -38,6 +39,7 @@ const PublishBook = () => {
   const [author, setAuthor] = useState("");
   const [price, setPrice] = useState("");
   const { account, provider, network, isConnected } = useWallet();
+  const navigate = useNavigate();
   const handleBookUpload = async () => {
     if (!isConnected || !provider) {
       alert("Wallet not connected");
@@ -99,10 +101,11 @@ const PublishBook = () => {
       } else {
         const cid = response.data.cid;
         const uri = `${import.meta.env.VITE_IPFS_GATEWAY}/${cid}`;
-        const priceInWei = ethers.parseUnits(price.toString(), 18);
+        const priceInWei = ethers.parseUnits(price.toString(), 8);
         const txn = await contract.uploadBook(uri, priceInWei);
         await txn.wait();
         toast.success("Book uploaded succesfully");
+        navigate("/books");
       }
     } catch (err) {
       console.error("Error: ", err);

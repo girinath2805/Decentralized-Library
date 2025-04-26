@@ -1,11 +1,11 @@
-import type { StoreBookType } from "../../types"
-import { Card, CardContent, CardFooter } from "../ui/card"
-import { Badge } from "../ui/badge"
-import { Button } from "../ui/button"
+import type { StoreBookType } from "../../types";
+import { Card, CardContent, CardFooter } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 
 interface StoreBookGridProps {
-  books: StoreBookType[]
-  onPurchase: (book: StoreBookType) => void
+  books: StoreBookType[];
+  onPurchase: (book: StoreBookType) => void;
 }
 
 export function StoreBookGrid({ books, onPurchase }: StoreBookGridProps) {
@@ -28,7 +28,9 @@ export function StoreBookGrid({ books, onPurchase }: StoreBookGridProps) {
           </CardContent>
           <CardFooter className="pt-0 flex justify-end items-center">
             <div className="text-right">
-              <div className="font-medium mb-1">${book.price.toFixed(2)}</div>
+              <div className="font-medium mb-1">
+                {(book.price / 1e8).toFixed(2)} HBAR
+              </div>
               <Button size="sm" onClick={() => onPurchase(book)}>
                 Buy Now
               </Button>
@@ -37,5 +39,5 @@ export function StoreBookGrid({ books, onPurchase }: StoreBookGridProps) {
         </Card>
       ))}
     </div>
-  )
+  );
 }
