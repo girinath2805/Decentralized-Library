@@ -71,11 +71,7 @@ const PublishBook = () => {
         file,
         bookId
       );
-      // const blob = await decryptFileFnc(ciphertext, dataToEncryptHash, bookId);
-      // const downloadLink = document.createElement("a");
-      // downloadLink.href = URL.createObjectURL(blob);
-      // downloadLink.download = "decrypted_" + file?.name || "file";
-      // downloadLink.click();
+
       const metadata = {
         ciphertext,
         dataToEncryptHash,
@@ -101,8 +97,8 @@ const PublishBook = () => {
       } else {
         const cid = response.data.cid;
         const uri = `${import.meta.env.VITE_IPFS_GATEWAY}/${cid}`;
-        const priceInWei = ethers.parseUnits(price.toString(), 8);
-        const txn = await contract.uploadBook(uri, priceInWei);
+        const priceInTinyBar = ethers.parseUnits(price.toString(), 8);
+        const txn = await contract.uploadBook(uri, priceInTinyBar);
         await txn.wait();
         toast.success("Book uploaded succesfully");
         navigate("/books");

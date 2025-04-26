@@ -84,15 +84,15 @@ export function PurchaseModal({
             </DialogHeader>
             <div className="flex items-center gap-4 py-4">
               <img
-                src={book.coverUrl || "/placeholder.svg"}
+                src={"/cover.webp"}
                 alt={book.title}
-                className="w-16 h-24 object-cover rounded"
+                className="w-fit h-20 object-cover rounded"
               />
               <div>
                 <h3 className="font-medium">{book.title}</h3>
                 <p className="text-sm text-muted-foreground">{book.author}</p>
                 <p className="text-sm font-medium mt-1">
-                  ${book.price.toFixed(2)}
+                  {(book.price / 1e8).toFixed(2)} HBAR
                 </p>
               </div>
             </div>
@@ -110,15 +110,15 @@ export function PurchaseModal({
             </DialogHeader>
             <div className="flex items-center gap-4 py-4">
               <img
-                src={book.coverUrl || "/placeholder.svg"}
+                src={"/cover.webp"}
                 alt={book.title}
-                className="w-16 h-24 object-cover rounded"
+                className="w-fit h-20 object-cover rounded"
               />
               <div>
                 <h3 className="font-medium">{book.title}</h3>
                 <p className="text-sm text-muted-foreground">{book.author}</p>
                 <p className="text-sm font-medium mt-1">
-                  ${book.price.toFixed(2)}
+                  {(book.price / 1e8).toFixed(2)} HBAR
                 </p>
               </div>
             </div>

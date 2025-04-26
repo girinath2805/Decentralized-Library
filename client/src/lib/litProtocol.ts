@@ -103,12 +103,7 @@ export const decryptFileFnc = async (
       type: "application/octet-stream",
     });
     return blob;
-    const downloadLink = document.createElement("a");
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = "decrypted_" + file?.name || "file";
-    downloadLink.click();
 
-    return { decryptedFile };
   } catch (err) {
     console.error("Decryption error:", err);
     alert("Error decrypting the file. Check the console for details.");

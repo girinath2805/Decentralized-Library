@@ -85,7 +85,7 @@ async function saveBookToDB(bookId, uri, uploader, price) {
       console.log("⚠️ Book already in DB")
       return
     }
-
+ 
     const newBook = new Book({
       _id: bookId.toString(), // Set the MongoDB _id to match the bookId
       bookId: bookId.toString(),
