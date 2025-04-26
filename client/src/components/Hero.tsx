@@ -4,10 +4,38 @@ import { cn } from "@/lib/utils";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useWallet } from "@/context/WalletContext";
+import { ethers } from "ethers";
+import { abi } from "@/abi";
 
 const Hero = () => {
   const navigate = useNavigate();
+  const { account, provider, isConnected } = useWallet();
+  const handlePublishClick = async () => {
+    if (!isConnected || !provider) {
+      alert("Wallet not connected");
+      return;
+    }
 
+    try {
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(
+        import.meta.env.VITE_CONTRACT_ADDRESS,
+        abi,
+        signer
+      );
+      if (Number(await contract.allocatedId(account)) != 0) {
+        return navigate("/upload");
+      }
+      const txn = await contract.allocateId();
+      const receipt = await txn.wait();
+
+      console.log("Transaction confirmed:", receipt);
+      navigate("/upload");
+    } catch (err) {
+      console.error("Error calling allocateId:", err);
+    }
+  };
   return (
     <section className="relative overflow-hidden py-32">
       <div className="absolute inset-x-0 top-0 flex h-full w-full items-center justify-center opacity-100">
@@ -49,7 +77,7 @@ const Hero = () => {
               <Button
                 variant="outline"
                 className="group"
-                onClick={() => navigate("/upload")}
+                onClick={() => handlePublishClick()}
               >
                 Publish Book{" "}
                 <ExternalLink className="ml-2 h-4 transition-transform group-hover:translate-x-0.5" />
