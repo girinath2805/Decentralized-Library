@@ -64,9 +64,9 @@ export function CollectionBookList({ books }: CollectionBookListProps) {
           <CardContent className="p-4">
             <div className="flex flex-col sm:flex-row gap-4 cursor-pointer">
               <img
-                src={book.coverUrl || "/placeholder.svg"}
+                src={"/coverown.jpg"}
                 alt={`Cover of ${book.title}`}
-                className="w-[100px] h-[150px] object-cover rounded-md"
+                className="w-auto h-[150px] object-cover rounded-md"
               />
               <div className="flex flex-col justify-between flex-grow">
                 <div>
