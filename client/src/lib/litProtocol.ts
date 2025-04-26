@@ -73,7 +73,11 @@ export const encryptFileFnc = async (fileToUpload, bookId) => {
     alert("Trouble uploading file");
   }
 };
-export const decryptFileFnc = async (ciphertext, dataToEncryptHash, bookId) => {
+export const decryptFileFnc = async (
+  ciphertext,
+  dataToEncryptHash,
+  bookId
+): Promise<Blob> => {
   try {
     const litNodeClient = new LitNodeClient({
       litNetwork: LIT_NETWORK.DatilDev,
