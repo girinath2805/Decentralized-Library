@@ -10,6 +10,7 @@ interface SearchFiltersProps {
   genres: string[]
 }
 
+
 const SearchFilters = ({
   searchTerm,
   onSearchChange,
